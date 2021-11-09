@@ -1,0 +1,16 @@
+{
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.python"
+    },
+    "python.formatting.blackArgs": [
+      "--line-length",
+      "170"
+    ],
+    "python.formatting.provider": "black",
+
+    "files.exclude": {
+      "**/*.pyc": {"when": "$(basename).py"},
+      "**/__pycache__": true,
+      }
+  }
