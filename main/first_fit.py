@@ -2,8 +2,9 @@ import string
 
 MAX_PROCESSES = 10
 PROCESS_NAMES = list(string.ascii_uppercase[:MAX_PROCESSES])
-TEXT_INPUT = "1,8;35,4;3,6;4,2;1,4;3,3;1,2;5,1;50,1"
 EMPTY_CELL = "X"
+TEXT_INPUT = "1,8;35,4;3,6;4,2;1,4;3,3;1,2;5,1;50,1"
+
 memory = []
 
 
