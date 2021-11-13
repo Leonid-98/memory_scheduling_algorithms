@@ -73,9 +73,9 @@ class MyGui(Frame):
         self.name_label = Label(self.outercanvas, text="A: [3, 5], B: [1, 2]", font=self.font, bg="#dbf7ff")
         self.outercanvas.create_window(630, 240, anchor=NW, height=50, width=300, window=self.name_label)
 
-    def convert_string_to_order(self, string):
-        """abifunktsioon mis teisendab sisend kujuks: str "1,0;2,3" --> list [[1, 0], [2, 3]] ning kohe sorrteerib saabumise aja kaudu"""
-        return sorted([[int(time) for time in process.split(",")] for process in string.split(";")], key=itemgetter(0))
+    def convert_string_to_order(self, string) -> list:
+        """abifunktsioon mis teisendab sisend kujuks: str "1,0;2,3" --> list [[1, 0], [2, 3]]"""
+        return [[int(time) for time in process.split(",")] for process in string.split(";")]
 
     def reset_inner_canvas(self):
         pass
