@@ -70,10 +70,10 @@ class MyGui(Frame):
         menu.config(font=self.font)
         self.outercanvas.create_window(20, 320, anchor=NW, height=30, width=220, window=self.option_menu)
 
-        self.name_label = Label(self.outercanvas, text="Operatsioonisüsteemid (LTAT.06.001)\nLeonid Tšigrinski 2021", font=self.font, bg="#dbf7ff")
+        self.name_label = Label(self.outercanvas, text="A: [3, 5], B: [1, 2]", font=self.font, bg="#dbf7ff")
         self.outercanvas.create_window(630, 240, anchor=NW, height=50, width=300, window=self.name_label)
 
-    def convert_string_to_process_queue(self, string):
+    def convert_string_to_order(self, string):
         """abifunktsioon mis teisendab sisend kujuks: str "1,0;2,3" --> list [[1, 0], [2, 3]] ning kohe sorrteerib saabumise aja kaudu"""
         return sorted([[int(time) for time in process.split(",")] for process in string.split(";")], key=itemgetter(0))
 
@@ -108,7 +108,6 @@ class MyGui(Frame):
                 color = "#7b9ba4"
                 self.innercanvas.create_rectangle(x1, y1, x2, y2, fill=color)
                 # self.innercanvas.create_text((x1 + 10), (y1 + 10), text="B", font=self.font)
-
 
 if __name__ == "__main__":
     root = Tk()
