@@ -9,6 +9,7 @@ class MyGui(Frame):
         super().__init__()
         self.master = master
         self.width = 1001
+        self.inner_height = 201
         master.title("Protsessoriaja haldus")
         master.geometry(f"{self.width + 40}x{370}")
         master.resizable(False, False)
@@ -38,7 +39,7 @@ class MyGui(Frame):
         self.outercanvas = Canvas(master, bg="#dbf7ff", width=self.width + 40, height=370)
         self.outercanvas.pack()
 
-        self.innercanvas = Canvas(self.outercanvas, width=self.width, height=201, bg="#7b9ba4", highlightthickness=0)
+        self.innercanvas = Canvas(self.outercanvas, width=self.width, height=self.inner_height, bg="#7b9ba4", highlightthickness=0)
         self.outercanvas.create_window(20, 20, anchor=NW, window=self.innercanvas)
 
         first_fit_button = Button(self.outercanvas, text="first-fit", font=self.font, command=lambda: self.calculate_schedue_and_draw(FIRST_FIT))
@@ -76,6 +77,8 @@ class MyGui(Frame):
         self.name_label = Label(self.outercanvas, text="zxc 123", font=self.font, bg="#dbf7ff")
         self.outercanvas.create_window(630, 240, anchor=NW, height=50, width=300, window=self.name_label)
 
+        self.max_steps = 10 # to be updated
+
     def convert_string_to_order(self, string) -> list:
         """abifunktsioon mis teisendab sisend kujuks: str "1,0;2,3" --> list [[1, 0], [2, 3]]"""
         return [[int(time) for time in process.split(",")] for process in string.split(";")]
@@ -96,23 +99,25 @@ class MyGui(Frame):
 
     def calculate_schedue_and_draw(self, type_of_algorithm):
         """event põhifunktsioon kalkuleerimise jaoks"""
+        self.innercanvas.delete("all")
         if self.option_menu_choise == "Enda oma üleval":
             order = self.convert_string_to_order(self.entry.get())
         else:
             order = self.convert_string_to_order(self.option_menu_choise)
-
-        print(order)
+        
         algorithm = MemoryAlgorithm(order)
+        self.max_steps = algorithm.get_max_steps(order)
         memory = algorithm.get_filled_memory(type_of_algorithm)
         self.draw_process_on_canvas(memory)
 
     def get_coordinates(self, row, column):
         """Abifunktsioon, mis tagastab Rectangle Objekti coordinatid et neeed joonistada"""
-        return (column * 20, row * 20, (column + 1) * 20, row * 20 + 20)
+        div = int(round(self.inner_height/self.max_steps)) - 1
+        return (column * 20, row * div, (column + 1) * 20, row * div + div)
 
     def draw_process_on_canvas(self, memory):
         """event abifunktsioon, et joonistada maatriks"""
-        for row in range(MAX_STEPS):
+        for row in range(self.max_steps):
             for column in range(MAX_SIZE):
                 x1, y1, x2, y2 = self.get_coordinates(row, column)
                 process_name = memory[row][column]

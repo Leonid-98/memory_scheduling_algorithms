@@ -1,10 +1,12 @@
+from random import randint
+import random
 import string
 from itertools import groupby
 from operator import itemgetter
+from tkinter.constants import PIESLICE
 
 EMPTY_CELL = ""
 ERROR_CELL = "-"
-MAX_STEPS = 10
 MAX_SIZE = 50
 
 FIRST_FIT = "ff"
@@ -17,12 +19,20 @@ RAND_FIT = "rf"
 class MemoryAlgorithm:
     def __init__(self, order):
         self.order = order
-        self.process_names = list(string.ascii_uppercase[:MAX_STEPS])
+        self.max_steps = self.get_max_steps(order)
+        self.process_names = list(string.ascii_uppercase[: self.max_steps])
+
+    def get_max_steps(self, order):
+        max_value = 0
+        for i, value in enumerate(order):
+            if value[1] + i > max_value:
+                max_value = value[1] + i
+        return max_value
 
     def _generate_empty_memory_space(self):
         """Genereerib vaba ruumi (maatriks) suurusega 10x50"""
         memory_space = []
-        for _ in range(MAX_STEPS):
+        for _ in range(self.max_steps):
             one_line = []
             for _ in range(MAX_SIZE):
                 one_line.append(EMPTY_CELL)
@@ -70,16 +80,49 @@ class MemoryAlgorithm:
 
             # fill the first row
             current_line = memory[index_of_process]
-            free_areas = self._check_for_free_sectors(current_line)
-            avaiable_areas = self._check_if_process_fits(free_areas, width)
-            is_process_allocated = True if avaiable_areas else False
+            free_areas = self._check_for_free_sectors(current_line)                 #list of list = list of free seectors
+            avaiable_areas_indexes = self._check_if_process_fits(free_areas, width) #list of index = list on number of AVAILABLE sector
+            is_process_allocated = True if avaiable_areas_indexes else False
+
+            if type_of_algorithm == FIRST_FIT:
+                i = 0
+
+            elif type_of_algorithm == LAST_FIT:
+                i = -1
+
+            elif type_of_algorithm == WORST_FIT:
+                free_areas = sorted(free_areas, key=len)
+                avaiable_areas_indexes = self._check_if_process_fits(free_areas, width)
+                i = -1
+
+            elif type_of_algorithm == RAND_FIT:
+                avaiable_areas_indexes = [i for i in range(len(free_areas))]
+                i = random.choice(avaiable_areas_indexes)
+                if width > len(free_areas[i]):
+                    is_process_allocated = False
+
+            elif type_of_algorithm == BEST_FIT:
+                best_fit = 999
+                best_fit_index = -1
+                for index in avaiable_areas_indexes:
+                    if abs(width - len(free_areas[index])) < best_fit:
+                        best_fit = abs(width - len(free_areas[index]))
+                        best_fit_index = index
+
+                i = best_fit_index
+                print(free_areas)
+                print(avaiable_areas_indexes)
+                print(i)
+                print()
+                
+                
+
 
             if is_process_allocated:
-                # first-fit
-                sector = free_areas[avaiable_areas[0]]
+                index_of_area = avaiable_areas_indexes[i]
+                sector = free_areas[index_of_area]
                 self._put_process_in_memory(sector, width, height, index_of_process, process_name, memory)
             else:
-                print("proceess can't be allocated")
                 for i in range(len(current_line)):
                     if current_line[i] == EMPTY_CELL:
                         current_line[i] = ERROR_CELL
