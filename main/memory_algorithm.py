@@ -80,8 +80,8 @@ class MemoryAlgorithm:
 
             # fill the first row
             current_line = memory[index_of_process]
-            free_areas = self._check_for_free_sectors(current_line)                 #list of list = list of free seectors
-            avaiable_areas_indexes = self._check_if_process_fits(free_areas, width) #list of index = list on number of AVAILABLE sector
+            free_areas = self._check_for_free_sectors(current_line)  # list of list = list of free seectors
+            avaiable_areas_indexes = self._check_if_process_fits(free_areas, width)  # list of index = list on number of AVAILABLE sector
             is_process_allocated = True if avaiable_areas_indexes else False
 
             if type_of_algorithm == FIRST_FIT:
@@ -89,6 +89,16 @@ class MemoryAlgorithm:
 
             elif type_of_algorithm == LAST_FIT:
                 i = -1
+
+            elif type_of_algorithm == BEST_FIT:
+                best_fit = 999
+                best_fit_index = -1
+                for i, value in enumerate(avaiable_areas_indexes):
+                    dif = len(free_areas[value]) - width
+                    if dif < best_fit and dif >= 0:
+                        best_fit = dif
+                        best_fit_index = i
+                i = best_fit_index
 
             elif type_of_algorithm == WORST_FIT:
                 free_areas = sorted(free_areas, key=len)
@@ -100,23 +110,6 @@ class MemoryAlgorithm:
                 i = random.choice(avaiable_areas_indexes)
                 if width > len(free_areas[i]):
                     is_process_allocated = False
-
-            elif type_of_algorithm == BEST_FIT:
-                best_fit = 999
-                best_fit_index = -1
-                for index in avaiable_areas_indexes:
-                    if abs(width - len(free_areas[index])) < best_fit:
-                        best_fit = abs(width - len(free_areas[index]))
-                        best_fit_index = index
-
-                i = best_fit_index
-                print(free_areas)
-                print(avaiable_areas_indexes)
-                print(i)
-                print()
-                
-                
-
 
             if is_process_allocated:
                 index_of_area = avaiable_areas_indexes[i]
@@ -132,9 +125,9 @@ class MemoryAlgorithm:
 
 
 if __name__ == "__main__":
-    # "1,10;6,6;3,9;2,4;1,6;5,2;1,4;5,2;2,1;2,7"
-    order = [[1, 10], [6, 6], [3, 9], [2, 4], [1, 6], [5, 2], [1, 4], [5, 2], [2, 1], [2, 7]]
+    # 1,8;7,4;10,6;25,2;1,4;13,3;6,2;8,1;50,1
+    order = [[1, 8], [7, 4], [10, 6], [25, 2], [1, 4], [13, 3], [6, 2], [8, 1], [50, 1]]
     algorithm = MemoryAlgorithm(order)
-    memory = algorithm.get_filled_memory(FIRST_FIT)
-    for i in memory:
-        print(i)
+    memory = algorithm.get_filled_memory(BEST_FIT)
+    # for i in memory:
+    #     print(i)

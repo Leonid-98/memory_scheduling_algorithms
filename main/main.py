@@ -9,9 +9,10 @@ class MyGui(Frame):
         super().__init__()
         self.master = master
         self.width = 1001
-        self.inner_height = 201
+        self.inner_height = 401
+        self.outer_height = self.inner_height + 169
         master.title("Protsessoriaja haldus")
-        master.geometry(f"{self.width + 40}x{370}")
+        master.geometry(f"{self.width + 40}x{self.inner_height + 169}")
         master.resizable(False, False)
         self.font = ("Bahnschrift SemiBold", 12)
         self.colors = {
@@ -32,37 +33,38 @@ class MyGui(Frame):
             "Enda oma üleval",
             "4,5;2,7;9,2;4,6;7,1;6,4;8,8;3,6;1,10;9,2",
             "1,10;6,6;3,9;2,4;1,6;5,2;1,4;5,2;2,1;2,7",
-            "5,10;6,6;3,9;8,4;3,6;5,12;1,4;15,3;3,4;9,7",
+            "1,8;35,4;3,6;4,2;1,4;3,3;1,2;5,1;50,1",
         ]
         self.option_menu_choise = defaults_for_option_menu[0]
 
-        self.outercanvas = Canvas(master, bg="#dbf7ff", width=self.width + 40, height=370)
+        self.outercanvas = Canvas(master, bg="#dbf7ff", width=self.width + 40, height=self.outer_height)
         self.outercanvas.pack()
 
-        self.innercanvas = Canvas(self.outercanvas, width=self.width, height=self.inner_height, bg="#7b9ba4", highlightthickness=0)
+        self.innercanvas = Canvas(self.outercanvas, width=self.width, height=self.inner_height, bg="#dbf7ff", highlightthickness=0)
         self.outercanvas.create_window(20, 20, anchor=NW, window=self.innercanvas)
 
         first_fit_button = Button(self.outercanvas, text="first-fit", font=self.font, command=lambda: self.calculate_schedue_and_draw(FIRST_FIT))
-        self.outercanvas.create_window(20, 240, anchor=NW, height=30, width=80, window=first_fit_button)
+        self.outercanvas.create_window(20, self.outer_height - 130, anchor=NW, height=30, width=80, window=first_fit_button)
 
         last_fit_btn = Button(self.outercanvas, text="last-fit", font=self.font, command=lambda: self.calculate_schedue_and_draw(LAST_FIT))
-        self.outercanvas.create_window(120, 240, anchor=NW, height=30, width=80, window=last_fit_btn)
+        self.outercanvas.create_window(120, self.outer_height - 130, anchor=NW, height=30, width=80, window=last_fit_btn)
 
         best_fit_btn = Button(self.outercanvas, text="best-fit", font=self.font, command=lambda: self.calculate_schedue_and_draw(BEST_FIT))
-        self.outercanvas.create_window(220, 240, anchor=NW, height=30, width=80, window=best_fit_btn)
+        self.outercanvas.create_window(220, self.outer_height - 130, anchor=NW, height=30, width=80, window=best_fit_btn)
 
         worst_fit_btn = Button(self.outercanvas, text="worst-fit", font=self.font, command=lambda: self.calculate_schedue_and_draw(WORST_FIT))
-        self.outercanvas.create_window(320, 240, anchor=NW, height=30, width=80, window=worst_fit_btn)
+        self.outercanvas.create_window(320, self.outer_height - 130, anchor=NW, height=30, width=80, window=worst_fit_btn)
 
         rand_fit_btn = Button(self.outercanvas, text="rand-fit", font=self.font, command=lambda: self.calculate_schedue_and_draw(RAND_FIT))
-        self.outercanvas.create_window(420, 240, anchor=NW, height=30, width=80, window=rand_fit_btn)
+        self.outercanvas.create_window(420, self.outer_height - 130, anchor=NW, height=30, width=80, window=rand_fit_btn)
 
         clear_btn = Button(self.outercanvas, text="Reset", font=self.font, command=lambda: self.reset_inner_canvas())
-        self.outercanvas.create_window(520, 240, anchor=NW, height=30, width=80, window=clear_btn)
+        self.outercanvas.create_window(520, self.outer_height - 130, anchor=NW, height=30, width=80, window=clear_btn)
 
         self.entry = Entry(self.outercanvas, font=self.font, state=NORMAL)
-        self.entry.insert(END, "1,8;35,4;3,6;4,2;1,4;3,3;1,2;5,1;50,1")
-        self.outercanvas.create_window(20, 280, anchor=NW, height=30, width=290, window=self.entry)
+        self.entry.insert(END, "5,10;6,6;3,9;8,4;3,6;5,12;1,4;15,3;3,4;9,7")
+        
+        self.outercanvas.create_window(20, self.outer_height - 90, anchor=NW, height=30, width=290, window=self.entry)
 
         self.option_menu_var = StringVar()
         self.option_menu_var.set(defaults_for_option_menu[0])
@@ -72,12 +74,12 @@ class MyGui(Frame):
         self.option_menu.config(font=self.font)
         menu = master.nametowidget(self.option_menu.menuname)
         menu.config(font=self.font)
-        self.outercanvas.create_window(20, 320, anchor=NW, height=30, width=290, window=self.option_menu)
+        self.outercanvas.create_window(20, self.outer_height - 50, anchor=NW, height=30, width=290, window=self.option_menu)
 
-        self.name_label = Label(self.outercanvas, text="zxc 123", font=self.font, bg="#dbf7ff")
-        self.outercanvas.create_window(630, 240, anchor=NW, height=50, width=300, window=self.name_label)
+        self.all_fits_label = Label(self.outercanvas, text="", font=self.font, bg="#dbf7ff")
+        self.outercanvas.create_window(630, self.outer_height - 130, anchor=NW, height=50, width=300, window=self.all_fits_label)
 
-        self.max_steps = 10 # to be updated
+        self.max_steps = 10  # to be updated
 
     def convert_string_to_order(self, string) -> list:
         """abifunktsioon mis teisendab sisend kujuks: str "1,0;2,3" --> list [[1, 0], [2, 3]]"""
@@ -85,9 +87,10 @@ class MyGui(Frame):
 
     def reset_inner_canvas(self):
         """event funktsion, puhastab sisemine canvas"""
+        self.all_fits_label["text"] = ""
         self.innercanvas.delete("all")
         self.entry.delete(0, END)
-        self.entry.insert(END, "1,8;35,4;3,6;4,2;1,4;3,3;1,2;5,1;50,1")
+        self.entry.insert(END, "5,10;6,6;3,9;8,4;3,6;5,12;1,4;15,3;3,4;9,7")
 
     def check_option_menu_choise(self, event_choice):
         """event funktsion option menu jaoks"""
@@ -100,11 +103,13 @@ class MyGui(Frame):
     def calculate_schedue_and_draw(self, type_of_algorithm):
         """event põhifunktsioon kalkuleerimise jaoks"""
         self.innercanvas.delete("all")
+        self.all_fits_label["text"] = ""
+
         if self.option_menu_choise == "Enda oma üleval":
             order = self.convert_string_to_order(self.entry.get())
         else:
             order = self.convert_string_to_order(self.option_menu_choise)
-        
+
         algorithm = MemoryAlgorithm(order)
         self.max_steps = algorithm.get_max_steps(order)
         memory = algorithm.get_filled_memory(type_of_algorithm)
@@ -112,11 +117,13 @@ class MyGui(Frame):
 
     def get_coordinates(self, row, column):
         """Abifunktsioon, mis tagastab Rectangle Objekti coordinatid et neeed joonistada"""
-        div = int(round(self.inner_height/self.max_steps)) - 1
+        div = int(round(self.inner_height / self.max_steps)) - 1
+        div = 20 if div > 20 else div ##############TODO MAYBE DELETE
         return (column * 20, row * div, (column + 1) * 20, row * div + div)
 
     def draw_process_on_canvas(self, memory):
-        """event abifunktsioon, et joonistada maatriks"""
+        """event abifunktsioon, et joonistada maatriks. Tagastab, kas algoritm lõppes töö edukalt või
+        mingi protsess ei mahu mällu"""
         for row in range(self.max_steps):
             for column in range(MAX_SIZE):
                 x1, y1, x2, y2 = self.get_coordinates(row, column)
@@ -124,6 +131,16 @@ class MyGui(Frame):
                 color = self.colors[process_name]
                 self.innercanvas.create_rectangle(x1, y1, x2, y2, fill=color)
                 self.innercanvas.create_text((x1 + 10), (y1 + 10), text=process_name, font=self.font)
+
+                if process_name == ERROR_CELL:
+                    self.all_fits_label["text"] = " \"-\" Tähendab, et protsess ei mahu mällu."
+
+        for last_row_elem in range(MAX_SIZE):
+            x1, y1, x2, y2 = self.get_coordinates(self.max_steps, last_row_elem)
+            y1 += 1
+            x2 += 1
+            self.innercanvas.create_rectangle(x1, y1, x2, y2, fill="#dbf7ff", width=0)
+
 
 
 if __name__ == "__main__":
