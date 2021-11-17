@@ -21,6 +21,10 @@ class MemoryAlgorithm:
         self.order = order
         self.max_steps = self.get_max_steps(order)
         self.process_names = list(string.ascii_uppercase[: self.max_steps])
+        self.not_fitted_name = None
+
+    def get_not_fitted_name(self):
+        return self.not_fitted_name
 
     def get_max_steps(self, order):
         max_value = 0
@@ -116,6 +120,7 @@ class MemoryAlgorithm:
                 sector = free_areas[index_of_area]
                 self._put_process_in_memory(sector, width, height, index_of_process, process_name, memory)
             else:
+                self.not_fitted_name = process_name
                 for i in range(len(current_line)):
                     if current_line[i] == EMPTY_CELL:
                         current_line[i] = ERROR_CELL
@@ -126,7 +131,7 @@ class MemoryAlgorithm:
 
 if __name__ == "__main__":
     # 1,8;7,4;10,6;25,2;1,4;13,3;6,2;8,1;50,1
-    order = [[1, 8], [7, 4], [10, 6], [25, 2], [1, 4], [13, 3], [6, 2], [8, 1], [50, 1]]
+    order = [[1, 8], [7, 4], [10, 6], [25, 2], [1, 4], [13, 3], [6, 2], [8, 1], [50, 1], [50, 1]]
     algorithm = MemoryAlgorithm(order)
     memory = algorithm.get_filled_memory(BEST_FIT)
     # for i in memory:

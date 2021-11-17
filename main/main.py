@@ -63,7 +63,6 @@ class MyGui(Frame):
 
         self.entry = Entry(self.outercanvas, font=self.font, state=NORMAL)
         self.entry.insert(END, "5,10;6,6;3,9;8,4;3,6;5,12;1,4;15,3;3,4;9,7")
-        
         self.outercanvas.create_window(20, self.outer_height - 90, anchor=NW, height=30, width=290, window=self.entry)
 
         self.option_menu_var = StringVar()
@@ -77,7 +76,11 @@ class MyGui(Frame):
         self.outercanvas.create_window(20, self.outer_height - 50, anchor=NW, height=30, width=290, window=self.option_menu)
 
         self.all_fits_label = Label(self.outercanvas, text="", font=self.font, bg="#dbf7ff")
-        self.outercanvas.create_window(630, self.outer_height - 130, anchor=NW, height=50, width=300, window=self.all_fits_label)
+        self.outercanvas.create_window(630, self.outer_height - 130, anchor=NW, height=30, width=300, window=self.all_fits_label)
+
+        text = str([[1, 8], [7, 4], [10, 6], [25, 2], [1, 4], [13, 3], [6, 2], [8, 1], [50, 1], [50, 1]])
+        self.order_label = Label(self.outercanvas, text=text, font=self.font, bg="#dbf7ff", justify=LEFT, anchor=W)
+        self.outercanvas.create_window(320, self.outer_height - 85, anchor=NW, height=25, width=750, window=self.order_label)
 
         self.max_steps = 10  # to be updated
 
@@ -88,6 +91,7 @@ class MyGui(Frame):
     def reset_inner_canvas(self):
         """event funktsion, puhastab sisemine canvas"""
         self.all_fits_label["text"] = ""
+        self.order_label["text"] = ""
         self.innercanvas.delete("all")
         self.entry.delete(0, END)
         self.entry.insert(END, "5,10;6,6;3,9;8,4;3,6;5,12;1,4;15,3;3,4;9,7")
@@ -104,24 +108,34 @@ class MyGui(Frame):
         """event põhifunktsioon kalkuleerimise jaoks"""
         self.innercanvas.delete("all")
         self.all_fits_label["text"] = ""
+        self.order_label["text"] = ""
 
         if self.option_menu_choise == "Enda oma üleval":
             order = self.convert_string_to_order(self.entry.get())
         else:
             order = self.convert_string_to_order(self.option_menu_choise)
-
         algorithm = MemoryAlgorithm(order)
+
         self.max_steps = algorithm.get_max_steps(order)
+        process_names = list(string.ascii_uppercase[: self.max_steps])
+
+        named_order = ""
+        for i, value in enumerate(order):
+            to_join = str(process_names[i]) + ":" + str(value) + "  "
+            named_order += to_join
+        self.order_label["text"] = named_order
+
         memory = algorithm.get_filled_memory(type_of_algorithm)
-        self.draw_process_on_canvas(memory)
+        not_fiitted_name = algorithm.get_not_fitted_name()
+        self.draw_process_on_canvas(memory, not_fiitted_name)
 
     def get_coordinates(self, row, column):
         """Abifunktsioon, mis tagastab Rectangle Objekti coordinatid et neeed joonistada"""
         div = int(round(self.inner_height / self.max_steps)) - 1
-        div = 20 if div > 20 else div ##############TODO MAYBE DELETE
+        # div = 20 if div > 20 else div ##############TODO MAYBE DELETE
         return (column * 20, row * div, (column + 1) * 20, row * div + div)
 
-    def draw_process_on_canvas(self, memory):
+    def draw_process_on_canvas(self, memory, not_fiitted_name):
         """event abifunktsioon, et joonistada maatriks. Tagastab, kas algoritm lõppes töö edukalt või
         mingi protsess ei mahu mällu"""
         for row in range(self.max_steps):
@@ -133,7 +147,7 @@ class MyGui(Frame):
                 self.innercanvas.create_text((x1 + 10), (y1 + 10), text=process_name, font=self.font)
 
                 if process_name == ERROR_CELL:
-                    self.all_fits_label["text"] = " \"-\" Tähendab, et protsess ei mahu mällu."
+                    self.all_fits_label["text"] = "Protsess " + not_fiitted_name + " ei mahu mällu!"
 
         for last_row_elem in range(MAX_SIZE):
             x1, y1, x2, y2 = self.get_coordinates(self.max_steps, last_row_elem)
