@@ -8,7 +8,7 @@ class MyGui(Frame):
         self.master = master
         self.max_steps = 10
         self.width = 1001
-        self.inner_height = 401
+        self.inner_height = 410
         self.outer_height = self.inner_height + 169
         master.title("Protsessoriaja haldus")
         master.geometry(f"{self.width + 40}x{self.inner_height + 169}")
@@ -149,6 +149,7 @@ class MyGui(Frame):
             y1 += 1
             x2 += 1
             self.innercanvas.create_rectangle(x1, y1, x2, y2, fill="#dbf7ff", width=0)
+            self.innercanvas.create_text((x1 + 10), (y1 + 10), text=last_row_elem, font=self.font)
 
 
 if __name__ == "__main__":
