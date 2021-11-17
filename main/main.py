@@ -1,5 +1,3 @@
-import itertools
-from operator import itemgetter
 from tkinter import *
 from memory_algorithm import *
 
