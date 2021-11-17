@@ -8,6 +8,7 @@ class MyGui(Frame):
     def __init__(self, master):
         super().__init__()
         self.master = master
+        self.max_steps = 10
         self.width = 1001
         self.inner_height = 401
         self.outer_height = self.inner_height + 169
@@ -67,9 +68,7 @@ class MyGui(Frame):
 
         self.option_menu_var = StringVar()
         self.option_menu_var.set(defaults_for_option_menu[0])
-        self.option_menu = OptionMenu(
-            self.outercanvas, self.option_menu_var, *defaults_for_option_menu, command=lambda event_choice: self.check_option_menu_choise(event_choice)
-        )
+        self.option_menu = OptionMenu(self.outercanvas, self.option_menu_var, *defaults_for_option_menu, command=lambda event_choice: self.check_option_menu_choise(event_choice))
         self.option_menu.config(font=self.font)
         menu = master.nametowidget(self.option_menu.menuname)
         menu.config(font=self.font)
@@ -81,8 +80,6 @@ class MyGui(Frame):
         text = str([[1, 8], [7, 4], [10, 6], [25, 2], [1, 4], [13, 3], [6, 2], [8, 1], [50, 1], [50, 1]])
         self.order_label = Label(self.outercanvas, text=text, font=self.font, bg="#dbf7ff", justify=LEFT, anchor=W)
         self.outercanvas.create_window(320, self.outer_height - 85, anchor=NW, height=25, width=750, window=self.order_label)
-
-        self.max_steps = 10  # to be updated
 
     def convert_string_to_order(self, string) -> list:
         """abifunktsioon mis teisendab sisend kujuks: str "1,0;2,3" --> list [[1, 0], [2, 3]]"""
@@ -154,7 +151,6 @@ class MyGui(Frame):
             y1 += 1
             x2 += 1
             self.innercanvas.create_rectangle(x1, y1, x2, y2, fill="#dbf7ff", width=0)
-
 
 
 if __name__ == "__main__":

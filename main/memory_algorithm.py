@@ -1,9 +1,7 @@
-from random import randint
 import random
 import string
 from itertools import groupby
 from operator import itemgetter
-from tkinter.constants import PIESLICE
 
 EMPTY_CELL = ""
 ERROR_CELL = "-"
@@ -51,7 +49,7 @@ class MemoryAlgorithm:
             if row[i] == EMPTY_CELL:
                 free_indexes.append(i)
 
-        # [1, 2, 4, 5, 7] -> [1, 2], [4, 5], [7]
+        # [1, 2, 4, 5, 7] -> [1, 2], [4, 5], [7] ehk sektoriks jagumine
         free_sectors = []
         for _, g in groupby(enumerate(free_indexes), lambda x: x[0] - x[1]):
             free_sectors.append(list(map(itemgetter(1), g)))
@@ -60,11 +58,11 @@ class MemoryAlgorithm:
 
     def _check_if_process_fits(self, free_sectors, process_size) -> list:
         """Kontrollib, kas protsess mahub vaba sektorisse, tagastab vaba sektori indeksid"""
-        available_sectors = []
+        available_sector_indexes = []
         for i in range(len(free_sectors)):
             if len(free_sectors[i]) >= process_size:
-                available_sectors.append(i)
-        return available_sectors
+                available_sector_indexes.append(i)
+        return available_sector_indexes
 
     def _put_process_in_memory(self, sector, width, height, index_of_process, process_name, memory):
         """Paneb mällu (matriksi) protsessid vastavalt vaba sektorile"""
@@ -82,12 +80,12 @@ class MemoryAlgorithm:
             width = process[0]  # process size
             height = process[1]  # number of steps
 
-            # fill the first row
             current_line = memory[index_of_process]
-            free_areas = self._check_for_free_sectors(current_line)  # list of list = list of free seectors
-            avaiable_areas_indexes = self._check_if_process_fits(free_areas, width)  # list of index = list on number of AVAILABLE sector
-            is_process_allocated = True if avaiable_areas_indexes else False
+            free_sectors = self._check_for_free_sectors(current_line)                  # list of list = list of free seectors
+            avaiable_sector_indexes = self._check_if_process_fits(free_sectors, width)  # list of indexes = list on number of AVAILABLE sector
+            is_process_allocated = True if avaiable_sector_indexes else False
 
+            # valin, mis sektor kasutan. i on sektri indeks
             if type_of_algorithm == FIRST_FIT:
                 i = 0
 
@@ -97,27 +95,28 @@ class MemoryAlgorithm:
             elif type_of_algorithm == BEST_FIT:
                 best_fit = 999
                 best_fit_index = -1
-                for i, value in enumerate(avaiable_areas_indexes):
-                    dif = len(free_areas[value]) - width
+                for i, value in enumerate(avaiable_sector_indexes):
+                    dif = len(free_sectors[value]) - width
                     if dif < best_fit and dif >= 0:
                         best_fit = dif
                         best_fit_index = i
                 i = best_fit_index
 
             elif type_of_algorithm == WORST_FIT:
-                free_areas = sorted(free_areas, key=len)
-                avaiable_areas_indexes = self._check_if_process_fits(free_areas, width)
+                free_sectors = sorted(free_sectors, key=len)
+                avaiable_sector_indexes = self._check_if_process_fits(free_sectors, width)
                 i = -1
 
             elif type_of_algorithm == RAND_FIT:
-                avaiable_areas_indexes = [i for i in range(len(free_areas))]
-                i = random.choice(avaiable_areas_indexes)
-                if width > len(free_areas[i]):
+                avaiable_sector_indexes = [i for i in range(len(free_sectors))]
+                i = random.choice(avaiable_sector_indexes)
+                if width > len(free_sectors[i]):
                     is_process_allocated = False
 
+            # panen protsess sektorisse (või katkestan töö kui ei mahu)
             if is_process_allocated:
-                index_of_area = avaiable_areas_indexes[i]
-                sector = free_areas[index_of_area]
+                index_of_area = avaiable_sector_indexes[i]
+                sector = free_sectors[index_of_area]
                 self._put_process_in_memory(sector, width, height, index_of_process, process_name, memory)
             else:
                 self.not_fitted_name = process_name
@@ -127,12 +126,3 @@ class MemoryAlgorithm:
                 break
 
         return memory
-
-
-if __name__ == "__main__":
-    # 1,8;7,4;10,6;25,2;1,4;13,3;6,2;8,1;50,1
-    order = [[1, 8], [7, 4], [10, 6], [25, 2], [1, 4], [13, 3], [6, 2], [8, 1], [50, 1], [50, 1]]
-    algorithm = MemoryAlgorithm(order)
-    memory = algorithm.get_filled_memory(BEST_FIT)
-    # for i in memory:
-    #     print(i)
